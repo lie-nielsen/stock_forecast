@@ -4,6 +4,7 @@ from __future__ import division
 import datetime
 from dateutil.relativedelta import relativedelta
 import itertools
+from trytond import modules
 
 from sql import Null
 from sql.aggregate import Sum
@@ -16,6 +17,7 @@ from trytond import backend
 from trytond.transaction import Transaction
 from trytond.pool import Pool
 from trytond.tools import reduce_ids, grouped_slice
+
 
 __all__ = ['Forecast', 'ForecastLine', 'ForecastLineMove',
     'ForecastCompleteAsk', 'ForecastCompleteChoose', 'ForecastComplete']
@@ -144,8 +146,11 @@ class Forecast(Workflow, ModelSQL, ModelView):
             table.drop_column('location', True)
 
         # Migration from 2.0 delete stock moves
-        forecasts = cls.search([])
-        cls.delete_moves(forecasts)
+        info = modules.get_module_info('stock_forecast')
+        (major_version, minor_version, _) = info['version'].split(".")
+        if int(major_version)*10 + int(minor_version) <= 20:
+            forecasts = cls.search([])
+            cls.delete_moves(forecasts)
 
     @staticmethod
     def default_state():
