@@ -4,7 +4,6 @@ from __future__ import division
 import datetime
 from dateutil.relativedelta import relativedelta
 import itertools
-from trytond import modules
 
 from sql import Null
 from sql.aggregate import Sum
@@ -17,6 +16,7 @@ from trytond import backend
 from trytond.transaction import Transaction
 from trytond.pool import Pool
 from trytond.tools import reduce_ids, grouped_slice
+from trytond import modules
 
 
 __all__ = ['Forecast', 'ForecastLine', 'ForecastLineMove',
