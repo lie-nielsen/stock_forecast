@@ -9,7 +9,7 @@ from sql.conditionals import Coalesce
 from trytond.model import ModelView, Workflow, ModelSQL, fields
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.pyson import Not, Equal, Eval, Or, Bool, If
-from trytond import backend
+from trytond import backend, modules
 from trytond.transaction import Transaction
 from trytond.pool import Pool
 from trytond.tools import reduce_ids, grouped_slice
@@ -137,8 +137,11 @@ class Forecast(Workflow, ModelSQL, ModelView):
             table.drop_column('location', True)
 
         # Migration from 2.0 delete stock moves
-        forecasts = cls.search([])
-        cls.delete_moves(forecasts)
+        info = modules.get_module_info('stock_forecast')
+        (major_version, minor_version, _) = info['version'].split(".")
+        if int(major_version)*10 + int(minor_version) <= 20:
+            forecasts = cls.search([])
+            cls.delete_moves(forecasts)
 
     @staticmethod
     def default_state():
